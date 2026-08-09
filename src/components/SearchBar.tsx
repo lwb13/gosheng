@@ -19,7 +19,7 @@ export default function SearchBar(props: SearchBarProps) {
       <Text style={_s.icon}>🔍</Text>
       <TextInput
         style={_s.input}
-        placeholder={p.placeholder || '搜索 CS:GO 饰品...'}
+        placeholder={p.placeholder || '搜索饰品'}
         placeholderTextColor={C.gray2}
         value={p.value}
         onChangeText={p.onChangeText}

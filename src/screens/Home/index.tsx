@@ -1,6 +1,6 @@
 /* ================================================================
  * Go神 商城首页
- * 结构: Hero横幅 → 分类Tab → 搜索栏 → 快捷入口 → 最新上架 → 商品网格
+ * 结构: 分类Tab → 搜索栏 → 2×2功能入口 → 最新上架 → 商品网格
  * ================================================================ */
 
 import React, { useState } from 'react';
@@ -17,12 +17,12 @@ import SectionHeader from '../../components/SectionHeader';
 import ProductCard from '../../components/ProductCard';
 
 /* ────────── 静态数据 ────────── */
-var _tabs = ['买饰品', '租饰品', '免费租', '好物竞拍'] as const;
+var _tabs = ['买饰品', '租饰品', '竞价'] as const;
 
 var _entries = [
   { id: 'e1', label: '匕首市场', icon: '🔪' },
   { id: 'e2', label: '手套市场', icon: '🧤' },
-  { id: 'e3', label: '科隆Major', icon: '🏆' },
+  { id: 'e3', label: '武库上新', icon: '📦' },
   { id: 'e4', label: '红皮专区', icon: '🔴' },
 ];
 
@@ -54,30 +54,7 @@ export default function HomeScreen() {
         contentContainerStyle={_s.scrollInner}
         showsVerticalScrollIndicator={false}
       >
-        {/* ──────── Hero 横幅 ──────── */}
-        <View style={_s.hero}>
-          <Text style={_s.heroTag}>🔥 全网最低价</Text>
-          <Text style={_s.heroTitle}>Go神饰品商城</Text>
-          <Text style={_s.heroSub}>千万玩家的 CS:GO 饰品交易平台</Text>
-          <View style={_s.heroStats}>
-            <View style={_s.heroStatItem}>
-              <Text style={_s.heroStatNum}>128,560</Text>
-              <Text style={_s.heroStatLabel}>在线饰品</Text>
-            </View>
-            <View style={_s.heroDivider} />
-            <View style={_s.heroStatItem}>
-              <Text style={_s.heroStatNum}>99.7%</Text>
-              <Text style={_s.heroStatLabel}>交易成功率</Text>
-            </View>
-            <View style={_s.heroDivider} />
-            <View style={_s.heroStatItem}>
-              <Text style={_s.heroStatNum}>30s</Text>
-              <Text style={_s.heroStatLabel}>极速到货</Text>
-            </View>
-          </View>
-        </View>
-
-        {/* ──────── 分类标签 ──────── */}
+        {/* ──────── 分类Tab ──────── */}
         <View style={_s.tabs}>
           {_tabs.map(function (tab) {
             var isActive = tab === activeTab;
@@ -94,10 +71,10 @@ export default function HomeScreen() {
           })}
         </View>
 
-        {/* ──────── 搜索栏 ──────── */}
+        {/* ──────── 搜索框 ──────── */}
         <SearchBar value={keyword} onChangeText={setKeyword} />
 
-        {/* ──────── 快捷入口 ──────── */}
+        {/* ──────── 2×2 功能入口 ──────── */}
         <View style={_s.entryGrid}>
           {_entries.map(function (e) {
             return (
@@ -135,89 +112,32 @@ export default function HomeScreen() {
 
 /* ────────── 样式 ────────── */
 var _s = StyleSheet.create({
-  root: { flex: 1, backgroundColor: C.bg },
+  root:  { flex: 1, backgroundColor: C.bg },
   scroll: { flex: 1 },
-  scrollInner: { paddingBottom: S.xxl },
+  scrollInner: { paddingTop: S.lg, paddingBottom: S.xxxl },
 
-  /* -- Hero 横幅 -- */
-  hero: {
-    marginHorizontal: 16,
-    marginTop: S.sm,
-    marginBottom: S.lg,
-    paddingHorizontal: S.xl,
-    paddingVertical: S.xxl,
-    borderRadius: R.xl,
-    backgroundColor: C.accent,
-    overflow: 'hidden',
-  },
-  heroTag: {
-    fontSize: F.sm,
-    fontWeight: W.semibold,
-    color: 'rgba(255,255,255,0.8)',
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    paddingHorizontal: S.sm,
-    paddingVertical: S.xs,
-    borderRadius: R.sm,
-    alignSelf: 'flex-start',
-    marginBottom: S.md,
-  },
-  heroTitle: {
-    fontSize: F.xxxl,
-    fontWeight: W.bold,
-    color: C.white,
-    marginBottom: S.xs,
-  },
-  heroSub: {
-    fontSize: F.base,
-    color: 'rgba(255,255,255,0.75)',
-    marginBottom: S.xxl,
-  },
-  heroStats: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  heroStatItem: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  heroStatNum: {
-    fontSize: F.price,
-    fontWeight: W.bold,
-    color: C.white,
-  },
-  heroStatLabel: {
-    fontSize: F.xs,
-    color: 'rgba(255,255,255,0.7)',
-    marginTop: S.xs,
-  },
-  heroDivider: {
-    width: 1,
-    height: 28,
-    backgroundColor: 'rgba(255,255,255,0.25)',
-  },
-
-  /* -- 分类标签 -- */
+  /* ── 分类Tab ── */
   tabs: {
     flexDirection: 'row',
-    paddingHorizontal: 16,
+    paddingHorizontal: PAGE_PAD,
     gap: CARD_GAP,
     marginBottom: S.md,
   },
   tab: {
-    paddingVertical: S.xs,
-    paddingHorizontal: 14,
+    paddingVertical: 5,
+    paddingHorizontal: 16,
     borderRadius: R.full,
     backgroundColor: C.border,
   },
   tabOn: { backgroundColor: C.accent },
-  tabTxt: { fontSize: F.md, color: C.gray },
-  tabTxtOn: { color: C.white, fontWeight: W.semibold },
+  tabTxt: { fontSize: F.md, color: C.gray, fontWeight: W.medium },
+  tabTxtOn: { fontSize: F.md, color: C.white, fontWeight: W.semibold },
 
-  /* -- 快捷入口 -- */
+  /* ── 2×2 功能入口 ── */
   entryGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    paddingHorizontal: 16,
+    paddingHorizontal: PAGE_PAD,
     gap: CARD_GAP,
     marginBottom: S.xl,
   },
@@ -239,14 +159,14 @@ var _s = StyleSheet.create({
     alignItems: 'center',
     marginRight: S.md,
   },
-  entryIcon: { fontSize: F.price },
+  entryIcon: { fontSize: F.icon },
   entryLabel: { fontSize: F.lg, fontWeight: W.semibold, color: C.white },
 
-  /* -- 商品网格 -- */
+  /* ── 商品网格 ── */
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    paddingHorizontal: 16,
+    paddingHorizontal: PAGE_PAD,
     gap: CARD_GAP,
   },
 });
