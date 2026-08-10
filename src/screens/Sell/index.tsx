@@ -1,19 +1,25 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { useAppTheme, ColorScheme, F, W, S } from '../../theme';
 
-var _c = { bg: '#0d0d1a', w: '#ffffff', g: '#8e8e9e' };
-
-export default function SellScreen() {
-  return React.createElement(View, { style: _s.root },
-    React.createElement(Text, { style: _s.icon }, '💰'),
-    React.createElement(Text, { style: _s.title }, '出售'),
-    React.createElement(Text, { style: _s.sub }, '发布饰品出售信息'),
-  );
+function createStyles(C: ColorScheme) {
+  return StyleSheet.create({
+    root: { flex: 1, backgroundColor: C.bg, justifyContent: 'center', alignItems: 'center' },
+    icon: { fontSize: 48, marginBottom: 16 },
+    title: { fontSize: 22, fontWeight: '700', color: C.white, marginBottom: 8 },
+    sub: { fontSize: 14, color: C.gray },
+  });
 }
 
-var _s = StyleSheet.create({
-  root: { flex: 1, backgroundColor: _c.bg, justifyContent: 'center', alignItems: 'center' },
-  icon: { fontSize: 48, marginBottom: 16 },
-  title: { fontSize: 22, fontWeight: '700', color: _c.w, marginBottom: 8 },
-  sub: { fontSize: 14, color: _c.g },
-});
+export default function SellScreen() {
+  var { C } = useAppTheme();
+  var _s = useMemo(function () { return createStyles(C); }, [C]);
+
+  return (
+    <View style={_s.root}>
+      <Text style={_s.icon}>💰</Text>
+      <Text style={_s.title}>出售</Text>
+      <Text style={_s.sub}>发布饰品出售信息</Text>
+    </View>
+  );
+}

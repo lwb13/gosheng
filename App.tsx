@@ -1,10 +1,8 @@
 /* ================================================================
  * Go神 CS饰品商城 — 唯一入口 App.tsx
  * 兼容旧版 Hermes：零 ES 私有字段，零不可转译语法
- * JSX 由 Babel 编译为 createElement，无运行时兼容问题
  * ================================================================ */
 
-/* 手势库必须在所有 import 之前加载（Android 硬性要求） */
 import 'react-native-gesture-handler';
 
 import { enableScreens } from 'react-native-screens';
@@ -23,6 +21,8 @@ import SellScreen      from './src/screens/Sell';
 import WantBuyScreen   from './src/screens/WantBuy';
 import MineScreen      from './src/screens/Mine';
 import AnimatedSplash  from './src/splash/AnimatedSplash';
+import { ThemeProvider, useAppTheme } from './src/theme';
+import { SteamProvider } from './src/store/SteamContext';
 
 /* ────────── 类型 ────────── */
 type TabParamList = {
@@ -35,7 +35,6 @@ type TabParamList = {
 
 var Tab = createBottomTabNavigator<TabParamList>();
 
-/* ────────── 静态配置 ────────── */
 var _tabCfg: Record<keyof TabParamList, { label: string; icon: string }> = {
   Home:      { label: 'Go神', icon: '🏠' },
   Inventory: { label: '库存', icon: '🎒' },
@@ -44,25 +43,13 @@ var _tabCfg: Record<keyof TabParamList, { label: string; icon: string }> = {
   Mine:      { label: '我的', icon: '👤' },
 };
 
-var _barStyle = {
-  backgroundColor: '#12122a',
-  borderTopColor:   '#1e1e3a',
-  borderTopWidth:    1,
-  height:            56,
-  paddingBottom:     6,
-  paddingTop:        4,
-} as const;
-
-var _labelStyle = {
-  fontSize:   11,
-  fontWeight: '600',
-} as const;
-
-/* ────────── App 根组件 ────────── */
-export default function App() {
+/* ────────── App 内容 (必须在 ThemeProvider 内部使用 hook) ────────── */
+function AppContent() {
   var _sd           = useState(false);
   var splashDone    = _sd[0];
   var setSplashDone = _sd[1];
+
+  var { C } = useAppTheme();
 
   var screenOpts = useMemo(function () {
     return function (props: { route: { name: string } }) {
@@ -79,15 +66,24 @@ export default function App() {
           );
         },
         tabBarLabel:            cfg.label,
-        tabBarActiveTintColor:   '#ff6b00',
-        tabBarInactiveTintColor: '#5a5a72',
-        tabBarStyle:             _barStyle,
-        tabBarLabelStyle:        _labelStyle,
+        tabBarActiveTintColor:   C.accent,
+        tabBarInactiveTintColor: C.gray2,
+        tabBarStyle: {
+          backgroundColor: C.bgSecondary,
+          borderTopColor:   C.border,
+          borderTopWidth:    1,
+          height:            56,
+          paddingBottom:     6,
+          paddingTop:        4,
+        },
+        tabBarLabelStyle: {
+          fontSize:   11,
+          fontWeight: '600' as const,
+        },
       };
     };
-  }, []);
+  }, [C]);
 
-  /* 闪屏未结束时显示动画 */
   if (!splashDone) {
     return <AnimatedSplash onFinish={function () { setSplashDone(true); }} />;
   }
@@ -104,6 +100,17 @@ export default function App() {
         </Tab.Navigator>
       </NavigationContainer>
     </GestureHandlerRootView>
+  );
+}
+
+/* ────────── App 根组件 ────────── */
+export default function App() {
+  return (
+    <ThemeProvider>
+      <SteamProvider>
+        <AppContent />
+      </SteamProvider>
+    </ThemeProvider>
   );
 }
 

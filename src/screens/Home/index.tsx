@@ -3,7 +3,7 @@
  * 结构: 分类Tab → 搜索栏 → 2×2功能入口 → 最新上架 → 商品网格
  * ================================================================ */
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -11,7 +11,10 @@ import {
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
-import { C, F, W, R, S, PAGE_PAD, CARD_GAP, GRID_2_COL } from '../../theme';
+import {
+  useAppTheme, ColorScheme,
+  F, W, R, S, PAGE_PAD, CARD_GAP, GRID_2_COL,
+} from '../../theme';
 import SearchBar from '../../components/SearchBar';
 import SectionHeader from '../../components/SectionHeader';
 import ProductCard from '../../components/ProductCard';
@@ -35,6 +38,71 @@ var _products = [
   { id: 'p6', name: '沙漠之鹰 | 炽热之焰', price: 890.0, wear: '破损不堪', stock: 156 },
 ];
 
+/* ────────── 样式工厂 ────────── */
+function createStyles(C: ColorScheme) {
+  return StyleSheet.create({
+    root:  { flex: 1, backgroundColor: C.bg },
+    scroll: { flex: 1 },
+    scrollInner: { paddingTop: S.lg, paddingBottom: S.xxxl },
+
+    tabs: {
+      flexDirection: 'row',
+      paddingHorizontal: PAGE_PAD,
+      gap: CARD_GAP,
+      marginBottom: S.md,
+    },
+    tab: {
+      paddingVertical: 5,
+      paddingHorizontal: 16,
+      borderRadius: R.full,
+      backgroundColor: C.border,
+    },
+    tabOn: { backgroundColor: C.accent },
+    tabTxt: { fontSize: F.md, color: C.gray, fontWeight: W.medium },
+    tabTxtOn: { fontSize: F.md, color: '#FFFFFF', fontWeight: W.semibold },
+
+    entryGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      paddingHorizontal: PAGE_PAD,
+      gap: CARD_GAP,
+      marginBottom: S.xl,
+    },
+    entryCard: {
+      width: GRID_2_COL,
+      height: 72,
+      borderRadius: R.lg,
+      backgroundColor: C.card,
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingLeft: S.lg,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.06,
+      shadowRadius: 4,
+      elevation: 2,
+    },
+    entryIconBox: {
+      width: 44,
+      height: 44,
+      borderRadius: R.xl,
+      backgroundColor: C.cardAlt,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: S.md,
+    },
+    entryIcon: { fontSize: F.icon },
+    entryLabel: { fontSize: F.lg, fontWeight: W.semibold, color: C.white },
+
+    grid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      paddingHorizontal: PAGE_PAD,
+      gap: CARD_GAP,
+    },
+  });
+}
+
 /* ================================================================
  * 主组件
  * ================================================================ */
@@ -47,6 +115,9 @@ export default function HomeScreen() {
   var keyword = _s2[0];
   var setKeyword = _s2[1];
 
+  var { C } = useAppTheme();
+  var _s = useMemo(function () { return createStyles(C); }, [C]);
+
   return (
     <View style={_s.root}>
       <ScrollView
@@ -54,7 +125,6 @@ export default function HomeScreen() {
         contentContainerStyle={_s.scrollInner}
         showsVerticalScrollIndicator={false}
       >
-        {/* ──────── 分类Tab ──────── */}
         <View style={_s.tabs}>
           {_tabs.map(function (tab) {
             var isActive = tab === activeTab;
@@ -71,10 +141,8 @@ export default function HomeScreen() {
           })}
         </View>
 
-        {/* ──────── 搜索框 ──────── */}
         <SearchBar value={keyword} onChangeText={setKeyword} />
 
-        {/* ──────── 2×2 功能入口 ──────── */}
         <View style={_s.entryGrid}>
           {_entries.map(function (e) {
             return (
@@ -88,10 +156,8 @@ export default function HomeScreen() {
           })}
         </View>
 
-        {/* ──────── 最新上架 ──────── */}
         <SectionHeader title="最新上架" linkText="查看全部 >" />
 
-        {/* ──────── 商品网格 ──────── */}
         <View style={_s.grid}>
           {_products.map(function (p) {
             return (
@@ -109,64 +175,3 @@ export default function HomeScreen() {
     </View>
   );
 }
-
-/* ────────── 样式 ────────── */
-var _s = StyleSheet.create({
-  root:  { flex: 1, backgroundColor: C.bg },
-  scroll: { flex: 1 },
-  scrollInner: { paddingTop: S.lg, paddingBottom: S.xxxl },
-
-  /* ── 分类Tab ── */
-  tabs: {
-    flexDirection: 'row',
-    paddingHorizontal: PAGE_PAD,
-    gap: CARD_GAP,
-    marginBottom: S.md,
-  },
-  tab: {
-    paddingVertical: 5,
-    paddingHorizontal: 16,
-    borderRadius: R.full,
-    backgroundColor: C.border,
-  },
-  tabOn: { backgroundColor: C.accent },
-  tabTxt: { fontSize: F.md, color: C.gray, fontWeight: W.medium },
-  tabTxtOn: { fontSize: F.md, color: C.white, fontWeight: W.semibold },
-
-  /* ── 2×2 功能入口 ── */
-  entryGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    paddingHorizontal: PAGE_PAD,
-    gap: CARD_GAP,
-    marginBottom: S.xl,
-  },
-  entryCard: {
-    width: GRID_2_COL,
-    height: 72,
-    borderRadius: R.lg,
-    backgroundColor: C.card,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingLeft: S.lg,
-  },
-  entryIconBox: {
-    width: 44,
-    height: 44,
-    borderRadius: R.xl,
-    backgroundColor: C.cardAlt,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: S.md,
-  },
-  entryIcon: { fontSize: F.icon },
-  entryLabel: { fontSize: F.lg, fontWeight: W.semibold, color: C.white },
-
-  /* ── 商品网格 ── */
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    paddingHorizontal: PAGE_PAD,
-    gap: CARD_GAP,
-  },
-});
