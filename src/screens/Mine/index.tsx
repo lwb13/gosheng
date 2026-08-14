@@ -1,5 +1,5 @@
 /* ================================================================
- * 个人中心 — 用户信息 + Steam绑定 + 功能菜单 + 主题切换
+ * 个人中心 — 用户信息 + Steam绑定 + 功能菜单 + 主题切换 + 登录
  * ================================================================ */
 
 import React, { useMemo, useState, useCallback } from 'react';
@@ -18,6 +18,7 @@ import {
 } from '../../theme';
 import { useSteam, SteamUser } from '../../store/SteamContext';
 import SteamAuth from '../SteamAuth';
+import AuthModal from '../../components/AuthModal';
 
 /* ────────── 类型 ────────── */
 interface MenuItemData { id: string; icon: string; label: string; badge?: number; onPress?: () => void; }
@@ -215,6 +216,11 @@ export default function MineScreen() {
   var showSteamAuth = _s1[0];
   var setShowSteamAuth = _s1[1];
 
+  /* ── 登录弹窗（默认未登录，进入"我的"即弹出）── */
+  var _s2 = useState(true);
+  var showAuth = _s2[0];
+  var setShowAuth = _s2[1];
+
   /* ── 绑定成功回调 ── */
   var handleBindSuccess = useCallback(function (u: SteamUser) {
     bindAccount(u);
@@ -409,6 +415,12 @@ export default function MineScreen() {
         visible={showSteamAuth}
         onClose={function () { setShowSteamAuth(false); }}
         onBindSuccess={handleBindSuccess}
+      />
+
+      {/* ── 登录弹窗 ── */}
+      <AuthModal
+        visible={showAuth}
+        onClose={function () { setShowAuth(false); }}
       />
     </View>
   );
