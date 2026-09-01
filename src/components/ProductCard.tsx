@@ -3,7 +3,7 @@
  * ================================================================ */
 
 import React, { useMemo } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import {
   useAppTheme, ColorScheme, getWearMap,
   F, W, R, S, fmtPrice, GRID_3_COL, CARD_GAP,
@@ -14,6 +14,7 @@ export interface ProductCardProps {
   price: number;
   wear: string;
   stock: number;
+  imageUrl?: string;
   horizontal?: boolean;
   actionLabel?: string;
   onPress?: () => void;
@@ -36,6 +37,7 @@ function createStyles(C: ColorScheme) {
       backgroundColor: C.cardAlt,
       justifyContent: 'center', alignItems: 'center',
     },
+    cardImgImg: { width: '100%', height: '100%' },
     cardImgTxt: { fontSize: F.icon, opacity: 0.4 },
     cardBody: { padding: S.sm },
     cardRow: {
@@ -54,6 +56,7 @@ function createStyles(C: ColorScheme) {
       backgroundColor: C.cardAlt,
       justifyContent: 'center', alignItems: 'center',
     },
+    hThumbImg: { width: 80, height: 80 },
     hThumbIcon: { fontSize: 36, opacity: 0.4 },
     hInfo: { flex: 1, marginLeft: S.md, marginRight: S.sm },
     hName: {
@@ -100,7 +103,11 @@ export default function ProductCard(props: ProductCardProps) {
     return (
       <TouchableOpacity style={_s.hCard} activeOpacity={0.8} onPress={p.onPress}>
         <View style={_s.hThumb}>
-          <Text style={_s.hThumbIcon}>🖼️</Text>
+          {p.imageUrl ? (
+            <Image source={{ uri: p.imageUrl }} style={_s.hThumbImg} resizeMode="contain" />
+          ) : (
+            <Text style={_s.hThumbIcon}>🖼️</Text>
+          )}
         </View>
         <View style={_s.hInfo}>
           <Text style={_s.hName} numberOfLines={1}>{p.name}</Text>
@@ -127,7 +134,11 @@ export default function ProductCard(props: ProductCardProps) {
   return (
     <TouchableOpacity style={_s.card} activeOpacity={0.8} onPress={p.onPress}>
       <View style={_s.cardImg}>
-        <Text style={_s.cardImgTxt}>🖼️</Text>
+        {p.imageUrl ? (
+          <Image source={{ uri: p.imageUrl }} style={_s.cardImgImg} resizeMode="contain" />
+        ) : (
+          <Text style={_s.cardImgTxt}>🖼️</Text>
+        )}
       </View>
       <View style={_s.cardBody}>
         <View style={_s.cardRow}>

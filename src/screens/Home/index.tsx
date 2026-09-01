@@ -3,7 +3,7 @@
  * 结构: 分类Tab → 搜索栏 → 2×2功能入口 → 最新上架 → 商品网格
  * ================================================================ */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   View,
   Text,
@@ -15,6 +15,8 @@ import {
   useAppTheme, ColorScheme,
   F, W, R, S, PAGE_PAD, CARD_GAP, GRID_2_COL,
 } from '../../theme';
+import axios from 'axios';
+import { API_BASE_URL } from '../../config';
 import SearchBar from '../../components/SearchBar';
 import SectionHeader from '../../components/SectionHeader';
 import ProductCard from '../../components/ProductCard';
@@ -29,14 +31,31 @@ var _entries = [
   { id: 'e4', label: '红皮专区', icon: '🔴' },
 ];
 
-var _products = [
-  { id: 'p1', name: 'AWP | 龙王', price: 1280.5, wear: '崭新出厂', stock: 234 },
-  { id: 'p2', name: 'AK-47 | 火蛇', price: 3560.0, wear: '略有磨损', stock: 89 },
-  { id: 'p3', name: 'M4A4 | 咆哮', price: 8999.9, wear: '久经沙场', stock: 12 },
-  { id: 'p4', name: 'USP-S | 击杀确认', price: 560.0, wear: '崭新出厂', stock: 567 },
-  { id: 'p5', name: '格洛克18型 | 水灵', price: 320.8, wear: '略有磨损', stock: 341 },
-  { id: 'p6', name: '沙漠之鹰 | 炽热之焰', price: 890.0, wear: '破损不堪', stock: 156 },
-];
+/* ────────── 磨损 英文→中文 ────────── */
+var _wearMap: Record<string, string> = {
+  'Factory New': '崭新出厂',
+  'Minimal Wear': '略有磨损',
+  'Field-Tested': '久经沙场',
+  'Well-Worn': '破损不堪',
+  'Battle-Scarred': '战痕累累',
+};
+
+/* ────────── 后端返回的饰品 ────────── */
+interface MarketItem {
+  name: string;
+  imageUrl: string;
+  price: number;
+  stock: number;
+}
+
+/* 解析市场名：拆出纯名称 + 中文磨损 */
+function parseName(rawName: string) {
+  var m = rawName.match(/\(([^)]*)\)\s*$/);
+  var wearEn = m ? m[1] : '';
+  var wear = _wearMap[wearEn] || wearEn;
+  var name = m ? rawName.slice(0, m.index).trim() : rawName;
+  return { name: name, wear: wear };
+}
 
 /* ────────── 样式工厂 ────────── */
 function createStyles(C: ColorScheme) {
@@ -100,6 +119,7 @@ function createStyles(C: ColorScheme) {
       paddingHorizontal: PAGE_PAD,
       gap: CARD_GAP,
     },
+    loadingTxt: { color: C.gray, textAlign: 'center', width: '100%', paddingVertical: 24 },
   });
 }
 
@@ -115,8 +135,32 @@ export default function HomeScreen() {
   var keyword = _s2[0];
   var setKeyword = _s2[1];
 
+  var _s3 = useState<MarketItem[]>([]);
+  var items = _s3[0];
+  var setItems = _s3[1];
+
+  var _s4 = useState(false);
+  var loading = _s4[0];
+  var setLoading = _s4[1];
+
   var { C } = useAppTheme();
   var _s = useMemo(function () { return createStyles(C); }, [C]);
+
+  /* 从后端拉真实饰品列表 */
+  useEffect(function () {
+    async function load() {
+      setLoading(true);
+      try {
+        var resp = await axios.get(API_BASE_URL + '/api/market/items?count=50', { timeout: 15000 });
+        setItems(resp.data.items || []);
+      } catch (e) {
+        // 加载失败保持空列表
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, []);
 
   return (
     <View style={_s.root}>
@@ -159,17 +203,23 @@ export default function HomeScreen() {
         <SectionHeader title="最新上架" linkText="查看全部 >" />
 
         <View style={_s.grid}>
-          {_products.map(function (p) {
-            return (
-              <ProductCard
-                key={p.id}
-                name={p.name}
-                price={p.price}
-                wear={p.wear}
-                stock={p.stock}
-              />
-            );
-          })}
+          {loading ? (
+            <Text style={_s.loadingTxt}>加载中...</Text>
+          ) : (
+            items.map(function (p, idx) {
+              var parsed = parseName(p.name);
+              return (
+                <ProductCard
+                  key={p.name + idx}
+                  name={parsed.name}
+                  price={p.price}
+                  wear={parsed.wear}
+                  stock={p.stock}
+                  imageUrl={p.imageUrl}
+                />
+              );
+            })
+          )}
         </View>
       </ScrollView>
     </View>

@@ -222,8 +222,8 @@ export default function MineScreen() {
   var setShowAuth = _s2[1];
 
   /* ── 绑定成功回调 ── */
-  var handleBindSuccess = useCallback(function (u: SteamUser) {
-    bindAccount(u);
+  var handleBindSuccess = useCallback(function (u: SteamUser, t: string) {
+    bindAccount(u, t);
   }, [bindAccount]);
 
   /* ── 解绑确认 ── */
@@ -302,11 +302,11 @@ export default function MineScreen() {
             </View>
             <View style={_s.steamCardBottom}>
               <View style={_s.steamStat}>
-                <Text style={_s.steamStatVal}>{user.inventoryCount}</Text>
+                <Text style={_s.steamStatVal}>{user.inventoryCount ?? 0}</Text>
                 <Text style={_s.steamStatLabel}>库存饰品</Text>
               </View>
               <View style={_s.steamStat}>
-                <Text style={_s.steamStatVal}>¥ {fmtPrice(user.inventoryCount * 350)}</Text>
+                <Text style={_s.steamStatVal}>¥ {fmtPrice((user.inventoryCount ?? 0) * 350)}</Text>
                 <Text style={_s.steamStatLabel}>估值</Text>
               </View>
               <View style={_s.steamStat}>
