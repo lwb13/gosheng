@@ -107,17 +107,37 @@ export var F = {
   xl: 17, xxl: 20, xxxl: 22, price: 24, icon: 32,
 } as const;
 
-/* ────────── 字重 ────────── */
+/* ────────── 字重 (对齐 DESIGN_SYSTEM.md §4.3) ────────── */
 export var W = {
+  light: '300' as const,
   regular: '400' as const,
   medium: '500' as const,
   semibold: '600' as const,
   bold: '700' as const,
+  extrabold: '800' as const,
 };
 
-/* ────────── 间距 ────────── */
+/* ────────── 行高 (对齐 DESIGN_SYSTEM.md §4.4) ────────── */
+export var LH = {
+  tight: 1.2,    // 标题
+  normal: 1.4,   // 正文
+  relaxed: 1.6,  // 长文本/说明
+} as const;
+
+/* ────────── 间距 (4px 基准网格, 对齐 DESIGN_SYSTEM.md §6) ────────── */
 export var S = {
-  xs: 4, sm: 8, md: 12, lg: 16, xl: 20, xxl: 24, xxxl: 32,
+  xxs: 2,        // space-0.5  图标微调
+  xs: 4,         // space-1    紧凑间距
+  sm: 8,         // space-2    卡片内边距/元素间隙
+  md: 12,        // space-3    搜索框内边距/区块间距
+  lg: 16,        // space-4    页面水平边距/卡片间距
+  xl: 20,        // space-5    大区块间距
+  xxl: 24,       // space-6    页面底部留白
+  xxxl: 32,      // space-8    页面顶部留白
+  xxxxl: 40,     // space-10   Hero 区间距
+  xxxxxl: 48,    // space-12   超大间距
+  space1_5: 6,   // space-1.5  TabBar 底部内边距
+  space2_5: 10,  // space-2.5  快捷入口间距
 } as const;
 
 /* ────────── 圆角 ────────── */
