@@ -16,6 +16,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import HomeScreen      from './src/screens/Home';
+import RankScreen      from './src/screens/Rank';
 import InventoryScreen from './src/screens/Inventory';
 import SellScreen      from './src/screens/Sell';
 import WantBuyScreen   from './src/screens/WantBuy';
@@ -27,6 +28,7 @@ import { SteamProvider } from './src/store/SteamContext';
 /* ────────── 类型 ────────── */
 type TabParamList = {
   Home:      undefined;
+  Rank:      undefined;
   Inventory: undefined;
   Sell:      undefined;
   WantBuy:   undefined;
@@ -37,6 +39,7 @@ var Tab = createBottomTabNavigator<TabParamList>();
 
 var _tabCfg: Record<keyof TabParamList, { label: string; icon: string }> = {
   Home:      { label: 'Go神', icon: '🏠' },
+  Rank:      { label: '看盘', icon: '📊' },
   Inventory: { label: '库存', icon: '🎒' },
   Sell:      { label: '出售', icon: '💰' },
   WantBuy:   { label: '求购', icon: '🛒' },
@@ -93,6 +96,7 @@ function AppContent() {
       <NavigationContainer>
         <Tab.Navigator screenOptions={screenOpts}>
           <Tab.Screen name="Home"      component={HomeScreen} />
+          <Tab.Screen name="Rank"      component={RankScreen} />
           <Tab.Screen name="Inventory" component={InventoryScreen} />
           <Tab.Screen name="Sell"      component={SellScreen} />
           <Tab.Screen name="WantBuy"   component={WantBuyScreen} />

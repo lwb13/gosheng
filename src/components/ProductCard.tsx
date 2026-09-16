@@ -15,6 +15,9 @@ export interface ProductCardProps {
   wear: string;
   stock: number;
   imageUrl?: string;
+  rank?: number;
+  tagText?: string;
+  tagColor?: string;
   horizontal?: boolean;
   actionLabel?: string;
   onPress?: () => void;
@@ -64,7 +67,7 @@ function createStyles(C: ColorScheme) {
       color: C.white, marginBottom: S.xs,
     },
     hMeta: {
-      flexDirection: 'row', alignItems: 'center',
+      flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap',
       gap: S.sm, marginBottom: S.xs,
     },
 
@@ -84,6 +87,15 @@ function createStyles(C: ColorScheme) {
       borderRadius: R.sm, backgroundColor: C.accent,
     },
     actionTxt: { fontSize: F.sm, fontWeight: W.semibold, color: '#FFFFFF' },
+
+    /* 榜单名次角标 */
+    rankBadge: {
+      position: 'absolute', top: 4, left: 4,
+      minWidth: 20, height: 20, borderRadius: R.full,
+      backgroundColor: C.accent, paddingHorizontal: 4,
+      justifyContent: 'center', alignItems: 'center',
+    },
+    rankBadgeTxt: { fontSize: F.xs, fontWeight: W.bold, color: '#FFFFFF' },
   });
 }
 
@@ -108,6 +120,9 @@ export default function ProductCard(props: ProductCardProps) {
           ) : (
             <Text style={_s.hThumbIcon}>🖼️</Text>
           )}
+          {p.rank != null ? (
+            <View style={_s.rankBadge}><Text style={_s.rankBadgeTxt}>{p.rank}</Text></View>
+          ) : null}
         </View>
         <View style={_s.hInfo}>
           <Text style={_s.hName} numberOfLines={1}>{p.name}</Text>
@@ -115,6 +130,11 @@ export default function ProductCard(props: ProductCardProps) {
             <View style={[_s.wearTag, { backgroundColor: wc }]}>
               <Text style={_s.wearTxt}>{p.wear}</Text>
             </View>
+            {p.tagText ? (
+              <View style={[_s.wearTag, { backgroundColor: p.tagColor || C.accent }]}>
+                <Text style={_s.wearTxt}>{p.tagText}</Text>
+              </View>
+            ) : null}
             <Text style={_s.stockTxt}>在售 {p.stock}</Text>
           </View>
           <Text style={_s.price}>
@@ -139,6 +159,9 @@ export default function ProductCard(props: ProductCardProps) {
         ) : (
           <Text style={_s.cardImgTxt}>🖼️</Text>
         )}
+        {p.rank != null ? (
+          <View style={_s.rankBadge}><Text style={_s.rankBadgeTxt}>{p.rank}</Text></View>
+        ) : null}
       </View>
       <View style={_s.cardBody}>
         <View style={_s.cardRow}>
