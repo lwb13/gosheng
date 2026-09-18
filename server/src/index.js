@@ -226,9 +226,10 @@ app.get('/api/market/items', async function (req, res) {
 app.get('/api/market/rank', async function (req, res) {
   try {
     var count = Math.min(parseInt(req.query.count) || 30, 100);
-    // 价格升序拉取低价饰品，才能命中「价低量大」的标的
+    // 价格升序拉低价皮肤（已按武器类型过滤，去掉涂鸦/贴纸/箱子）
     var url = 'https://steamcommunity.com/market/search/render/' +
-      '?appid=730&norender=1&count=' + count + '&start=0&sort_column=price&sort_dir=asc';
+      '?appid=730&norender=1&count=100&start=0&sort_column=price&sort_dir=asc' +
+      WEAPON_TYPE_FILTER;
     var data = await fetchSteamJson(url);
     var results = data.results || [];
 
@@ -257,7 +258,7 @@ app.get('/api/market/rank', async function (req, res) {
       })
       .sort(function (a, b) { return b.score - a.score; });
 
-    res.json({ total: items.length, items: items });
+    res.json({ total: items.length, items: items.slice(0, count) });
   } catch (e) {
     res.status(500).json({ error: '查询性价比排名失败：' + e.message });
   }
@@ -278,6 +279,17 @@ var isSlowScanning = false;
 
 /* 排除非饰品类型 */
 var EXCLUDE_TYPES = ['Sticker', 'Graffiti', 'Patch', 'Capsule', 'Music Kit', 'Pin', 'Pass', 'Container', 'Charm'];
+
+/* 只搜武器皮肤（排除涂鸦/贴纸/箱子/音乐盒等），从源头保证结果是可交易皮肤 */
+var WEAPON_TYPE_FILTER =
+  '&category_730_Type%5B%5D=tag_CSGO_Type_Pistol' +
+  '&category_730_Type%5B%5D=tag_CSGO_Type_SMG' +
+  '&category_730_Type%5B%5D=tag_CSGO_Type_Rifle' +
+  '&category_730_Type%5B%5D=tag_CSGO_Type_Shotgun' +
+  '&category_730_Type%5B%5D=tag_CSGO_Type_SniperRifle' +
+  '&category_730_Type%5B%5D=tag_CSGO_Type_Machinegun' +
+  '&category_730_Type%5B%5D=tag_CSGO_Type_Knife' +
+  '&category_730_Type%5B%5D=tag_CSGO_Type_Gloves';
 
 function isSkinName(name) {
   if (!name || name.indexOf('|') === -1) return false;
@@ -304,18 +316,25 @@ async function fetchSteam(url, opts) {
   var wait = _lastFetch + _minInterval - Date.now();
   if (wait > 0) await new Promise(function (r) { setTimeout(r, wait); });
 
-  var headers = { 'User-Agent': 'GoShen/1.0' };
+  // Steam 对 undici 默认的 `accept-language: *` 会返回 400，这里显式覆盖为正常值；
+  // 去掉 br（undici 不解压 brotli），只声明 gzip/deflate。
+  var headers = {
+    'User-Agent': 'GoShen/1.0',
+    'Accept-Language': 'en-US,en;q=0.9',
+    'Accept-Encoding': 'gzip, deflate',
+  };
   if (opts.referer) headers['Referer'] = opts.referer;
 
   var attempt = 0;
   while (true) {
     _lastFetch = Date.now();
     var resp = await fetch(url, { headers: headers });
-    if (resp.status === 429 || resp.status === 503) {
+    // 429/503 限流；400 也可能是 Steam 的软限流（返回 []），一并退避重试
+    if (resp.status === 429 || resp.status === 503 || resp.status === 400) {
       attempt += 1;
       if (attempt > 4) throw new Error('Steam 限流：HTTP ' + resp.status);
       var backoff = Math.min(1000 * Math.pow(2, attempt), 30000);
-      console.warn('Steam 限流，' + (backoff / 1000) + 's 后重试');
+      console.warn('Steam ' + resp.status + '，' + (backoff / 1000) + 's 后重试');
       await new Promise(function (r) { setTimeout(r, backoff); });
       continue;
     }
@@ -345,7 +364,8 @@ async function getNameId(hashName) {
 /* 刷新 watchlist：从市场列表按价格降序取高价值饰品 */
 async function refreshWatchlist() {
   var url = 'https://steamcommunity.com/market/search/render/' +
-    '?appid=730&norender=1&count=30&start=0&sort_column=price&sort_dir=desc';
+    '?appid=730&norender=1&count=30&start=0&sort_column=price&sort_dir=desc' +
+    WEAPON_TYPE_FILTER;
   var data = await fetchSteamJson(url);
   var results = (data && data.results) || [];
   var list = [];
